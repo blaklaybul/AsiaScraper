@@ -8,3 +8,4 @@ DATABASE = {
     "password" : "",
     "database" : "techinasia"
 }
+ITEM_PIPELINES = ['scraper_app.pipelines.TechInAsiaPipeline']

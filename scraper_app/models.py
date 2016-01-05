@@ -18,5 +18,3 @@ class StartupUrls(DeclarativeBase):
 
     id = Column(Integer, primary_key = True)
     url = Column("PathSuffix", String)
-    startupname = Column("StartupName", String)
-    
