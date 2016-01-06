@@ -7,6 +7,7 @@ import settings
 DeclarativeBase = declarative_base()
 
 def db_connect():
+    print(URL(**settings.DATABASE))
     return create_engine(URL(**settings.DATABASE))
 
 def create_startupUrls_table(engine):

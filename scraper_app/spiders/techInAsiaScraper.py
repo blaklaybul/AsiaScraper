@@ -3,10 +3,10 @@ from scrapy.selector import HtmlXPathSelector
 from scrapy.contrib.loader import XPathItemLoader
 from scrapy.contrib.loader.processor import Join, MapCompose
 
-from srapy_app.items import SearchResults
+from scraper_app.items import SearchResults
 
 class TechInAsiaSpider(BaseSpider):
-    name = "StartupSpider"
+    name = "techinasia"
     allowed_domains = ["techinasia.com"]
     long_url = ("https://www.techinasia.com/startups?sort=-funding_round_"
         "amount&country_name[]=India&country_name[]=China&country_name[]=Samoa"
@@ -30,7 +30,7 @@ class TechInAsiaSpider(BaseSpider):
         "url": './/@href',
     }
 
-    def parse(self, resposne):
+    def parse(self, response):
 
         selector = HtmlXPathSelector(response)
 
