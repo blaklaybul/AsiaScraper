@@ -16,6 +16,7 @@ def main():
     investors = []
     stages = []
     investorfunds = []
+    industries = []
 
     # construct company objects for database insertion
     for company in data:
@@ -29,7 +30,7 @@ def main():
         search_results["FundingStage"] = company["stage"]["name"]
         companies.append(search_results)
 
-        ## !!! ADD INDUSTRIES
+
 
     # now we get use tiaURLS to get funding data for each startup
     for company in companies:
@@ -63,6 +64,8 @@ def main():
 
                     investorfunds.append(investor_fund_data)
 
+        for industry in company_data["entity"]["industry"]
+
     # build out investors
     for investor in investorfunds:
         investor_data = {}
@@ -81,7 +84,7 @@ def main():
         print(investor_response["name"])
 
         investor_data["InvestorName"] = investor_response["name"]
-        investor_data["tiaInvestorID"] = investor_response["id"]
+        investor_data["tiaInvestorID"] = investor_response["entity"]["id"]
         investor_data["InvestorType"] = investor_response["entity"]["taxonomies"][0]["name"] if investor_response["entity"]["taxonomies"] else ''
         investor_data["InvestorLocation"] = location
 
@@ -257,7 +260,7 @@ def InsertInvestorsToFundingStages(conn, investorfunds):
         ",'" + investor["tiaInvestorID"] + "'" +
         """WHERE NOT EXISTS
         (SELECT 1 FROM InvestorToFundingStage WHERE tiaFundingStageID = """ + "'" +
-        investor["tiaFundingStageID"] + "' AND tiaInvestorID = + """ + "'" + investor["tiaInvestorID"]
+        investor["tiaFundingStageID"] + "' AND tiaInvestorID = """ + "'" + investor["tiaInvestorID"]
         + "');"
         )
 
