@@ -1,7 +1,5 @@
-import json
 import requests
 import psycopg2
-import sys
 import datetime
 
 # imports set variables in separate file
@@ -9,9 +7,10 @@ import api_vars
 
 def main():
 
-    r = requests.get(api_vars.search_startups)
+    r = requests.get(api_vars.search_startups(1,100))
     data = r.json()["data"]
     print("received " + str(len(data))+ " companies")
+    slugs = []
     companies = []
     investors = []
     stages = []
@@ -23,34 +22,48 @@ def main():
         search_results = {}
         search_results["CompanyName"] = company["company"]["name"]
         search_results["tiaCompanyID"] = company["company"]["id"]
-        search_results["Country"] = company["country"]["name"]
         search_results["tiaURL"] = "companies/" + company["entity"]["slug"]
+        search_results["Country"] = company["country"]["name"]
         search_results["LatestFundingDate"] = datetime.datetime.strptime(company["funding_round"]["date"],"%Y-%m-%d")
         search_results["LatestFundingAmount"] = int(company["funding_round"]["amount"])
         search_results["FundingStage"] = company["stage"]["name"]
-        companies.append(search_results)
+
+        slugs.append(search_results)
 
     # now we get use tiaURLS to get funding data for each startup
-    for company in companies:
+    for company in slugs:
+        company_profile = {}
 
-        print(company["CompanyName"])
+        print("......processing " + company["CompanyName"])
 
         r = requests.get(api_vars.startup + company["tiaURL"])
         company_data = r.json()
+
+        company_profile["CompanyName"] = company_data["name"]
+        company_profile["tiaCompanyID"] = company_data["id"]
+        company_profile["Country"] = company["Country"]
+        company_profile["tiaURL"] = "companies/" + company_data["entity"]["slug"]
+        company_profile["LatestFundingAmount"] = int(company["LatestFundingAmount"])
+        company_profile["LatestFundingDate"] = company["LatestFundingDate"]
+        company_profile["FundingStage"] = company["FundingStage"]
+        company_profile["FoundedDate"] = datetime.datetime.strptime(company_data["date_founded"],"%Y-%m-%d")
+        companies.append(company_profile)
 
         # build out funding stages
         for stage in company_data["funding_stages"]:
             funding_stage = {}
 
-            funding_stage["amount"] = stage["rounds"][0]["amount"]
-            funding_stage["tiaFundingStageID"] = stage["id"]
-            funding_stage["tiaCompanyID"] = stage["company_id"]
-            funding_stage["stageName"] = stage["stage"]["name"]
-            funding_stage["dateClosed"] = stage["rounds"][0]["date_ended"]
-
-            stages.append(funding_stage)
-
             for fround in stage["rounds"]:
+
+                funding_stage["amount"] = fround["amount"]
+                funding_stage["tiaFundingStageID"] = stage["id"]
+                funding_stage["tiaFundingRoundID"] = fround["id"]
+                funding_stage["tiaCompanyID"] = stage["company_id"]
+                funding_stage["stageName"] = stage["stage"]["name"]
+                funding_stage["dateClosed"] = datetime.datetime.strptime(fround["date_ended"],"%Y-%m-%d")
+
+                stages.append(funding_stage)
+
                 for investor in fround["participants"]:
                     investor_fund_data = {}
 
@@ -84,7 +97,7 @@ def main():
             if loc["type"].lower() == "hq":
                 location = loc["country"]["name"]
 
-        print(investor_response["name"])
+        print("......processing " + investor_response["name"])
 
         investor_data["InvestorName"] = investor_response["name"]
         investor_data["tiaInvestorID"] = investor_response["entity"]["id"]
@@ -92,13 +105,13 @@ def main():
         investor_data["InvestorLocation"] = location
 
         investors.append(investor_data)
+
     ## Here to the end we run our database work
     try:
-        conn = psycopg2.connect("dbname = 'techinasia' user = 'michaelhi' host = 'localhost'")
+        conn = psycopg2.connect("dbname = dev_techinasia user = michaelhi host = localhost")
         print("Successfully connected to techinasia database")
     except:
         print("FAILBLOG: connection to database failed")
-
 
     createTables(conn)
 
@@ -145,6 +158,7 @@ def createTables(conn):
         ,LatestFundingDate DATE NULL
         ,LatestFundingAmount INT NULL
         ,FundingStage TEXT NULL
+        ,FoundedDate DATE NULL
         );
     """)
 
@@ -167,11 +181,13 @@ def createTables(conn):
     cur.execute("""
         CREATE TABLE FundingStages
         (
-            tiaFundingStageID TEXT PRIMARY KEY NOT NULL
+            tiaFundingStageID TEXT NOT NULL
+            ,tiaFundingRoundID TEXT NOT NULL
             ,amount INT NULL
             ,tiaCompanyID TEXT NULL
             ,stageName TEXT NULL
             ,dateClosed DATE NULL
+            ,PRIMARY KEY(tiaFundingStageID, tiaFundingRoundID)
         )
     """)
 
@@ -214,6 +230,7 @@ def InsertStartupData(conn, companies):
         ,LatestFundingDate
         ,LatestFundingAmount
         ,FundingStage
+        ,FoundedDate
     )
     VALUES
     (
@@ -224,6 +241,7 @@ def InsertStartupData(conn, companies):
         ,%(LatestFundingDate)s
         ,%(LatestFundingAmount)s
         ,%(FundingStage)s
+        ,%(FoundedDate)s
     );
     """, companies)
 
@@ -242,6 +260,7 @@ def InsertFundingStages(conn, stages):
         ,tiaCompanyID
         ,stageName
         ,dateClosed
+        ,tiaFundingRoundID
     )
     VALUES
     (
@@ -250,6 +269,7 @@ def InsertFundingStages(conn, stages):
         ,%(tiaCompanyID)s
         ,%(stageName)s
         ,%(dateClosed)s
+        ,%(tiaFundingRoundID)s
     );
     """, stages)
 
