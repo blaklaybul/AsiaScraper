@@ -30,12 +30,8 @@ def main():
         search_results["FundingStage"] = company["stage"]["name"]
         companies.append(search_results)
 
-
-
     # now we get use tiaURLS to get funding data for each startup
     for company in companies:
-        funding_info = {}
-        investor_to_fundingstage = {}
 
         print(company["CompanyName"])
 
@@ -64,7 +60,14 @@ def main():
 
                     investorfunds.append(investor_fund_data)
 
-        for industry in company_data["entity"]["industry"]
+        for industry in company_data["entity"]["industries"]:
+            industry_data = {}
+
+            industry_data["tiaCompanyID"] = company_data["id"]
+            industry_data["industryName"] = industry["name"]
+            industry_data["industryID"] = industry["id"]
+
+            industries.append(industry_data)
 
     # build out investors
     for investor in investorfunds:
@@ -105,6 +108,7 @@ def main():
     InsertInvestorsToFundingStages(conn, investorfunds)
     InsertFundingStages(conn, stages)
     InsertInvestors(conn,investors)
+    InsertIndustries(conn, industries)
 
     print("Done With Inserts, Closing Connection")
 
@@ -121,6 +125,7 @@ def createTables(conn):
         DROP TABLE IF EXISTS Investors;
         DROP TABLE IF EXISTS FundingStages;
         DROP TABLE IF EXISTS InvestorToFundingStage;
+        DROP TABLE IF EXISTS Industries;
     """
     )
 
@@ -134,9 +139,9 @@ def createTables(conn):
         CREATE TABLE StartUps
         (
         tiaCompanyID TEXT PRIMARY KEY NOT NULL
-        ,CompanyName TEXT NOT NULL
+        ,CompanyName TEXT NULL
         ,Country TEXT NULL
-        ,tiaURL TEXT NOT NULL
+        ,tiaURL TEXT  NULL
         ,LatestFundingDate DATE NULL
         ,LatestFundingAmount INT NULL
         ,FundingStage TEXT NULL
@@ -150,9 +155,9 @@ def createTables(conn):
         CREATE TABLE Investors
         (
             tiaInvestorID TEXT PRIMARY KEY NOT NULL
-            ,InvestorName TEXT NOT NULL
-            ,InvestorType TEXT NOT NULL
-            ,InvestorLocation TEXT NOT NULL
+            ,InvestorName TEXT NULL
+            ,InvestorType TEXT NULL
+            ,InvestorLocation TEXT NULL
         )
     """)
 
@@ -163,8 +168,8 @@ def createTables(conn):
         CREATE TABLE FundingStages
         (
             tiaFundingStageID TEXT PRIMARY KEY NOT NULL
-            ,amount INT NOT NULL
-            ,tiaCompanyID TEXT NOT NULL
+            ,amount INT NULL
+            ,tiaCompanyID TEXT NULL
             ,stageName TEXT NULL
             ,dateClosed DATE NULL
         )
@@ -184,6 +189,16 @@ def createTables(conn):
 
     conn.commit()
     print("    -> InvestorToFundingStage Table Created in Postgres")
+
+    cur.execute("""
+        CREATE TABLE Industries
+        (
+            tiaCompanyID TEXT NOT NULL
+            ,industryID TEXT NOT NULL
+            ,industryName TEXT NULL
+            ,PRIMARY KEY(tiaCompanyID, industryID)
+        )
+    """)
 
 def InsertStartupData(conn, companies):
 
@@ -213,7 +228,6 @@ def InsertStartupData(conn, companies):
     """, companies)
 
     conn.commit()
-
     print("    -> inserted startup data")
 
 def InsertFundingStages(conn, stages):
@@ -240,15 +254,12 @@ def InsertFundingStages(conn, stages):
     """, stages)
 
     conn.commit()
-
     print("    -> inserted FundingStages data")
 
 def InsertInvestorsToFundingStages(conn, investorfunds):
 
     cur = conn.cursor()
-
     for investor in investorfunds:
-
         cur.execute("""
         INSERT INTO InvestorToFundingStage
         (
@@ -265,18 +276,13 @@ def InsertInvestorsToFundingStages(conn, investorfunds):
         )
 
     conn.commit()
-
     print("    -> inserted InvestorsToFundingStages data")
 
 
 def InsertInvestors(conn, investors):
 
     cur = conn.cursor()
-
-    print(investors)
-
     for investor in investors:
-
         cur.execute("""
         INSERT INTO Investors
         (
@@ -295,9 +301,29 @@ def InsertInvestors(conn, investors):
         )
 
     conn.commit()
-
     print("    -> inserted Investors data")
 
+def InsertIndustries(conn, industries):
+
+    cur = conn.cursor()
+
+    cur.executemany("""
+    INSERT INTO Industries
+    (
+        tiaCompanyID
+        ,industryID
+        ,industryName
+    )
+    VALUES
+    (
+        %(tiaCompanyID)s
+        ,%(industryID)s
+        ,%(industryName)s
+    );
+    """, industries)
+
+    conn.commit()
+    print("    -> inserted Industry data")
 
 if __name__ == '__main__':
     main()
