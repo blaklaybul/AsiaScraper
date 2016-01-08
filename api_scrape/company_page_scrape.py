@@ -10,16 +10,22 @@ def main():
     period = 500
     counter = 0
 
-    company_page_array = []
+    try:
+        with open("company_pages.json", "rb") as ff:
+            company_page_array = json.load(ff)
+    except:
+        company_page_array = []
+
+    print len(company_page_array)
 
     # load the search_results to get company slugs
     with open("search_results.json", "rb") as f:
         driver = json.load(f)
 
-    number_of_companies = len(driver)
-    print("preparing to hit " + str(number_of_companies) + " company pages...")
+    to_scrape = [i for i in driver if i and i["scraped"] == 0]
+    number_of_companies = len(to_scrape)
 
-    for i, company in enumerate(driver):
+    for i, company in enumerate(to_scrape):
         print("#" + str(i) + " of " + str(number_of_companies) + " " + company["entity"]["slug"])
 
         r = requests.get(api_vars.startup + company["entity"]["slug"])
@@ -32,6 +38,8 @@ def main():
             with open("company_pages.json", "wb") as f:
                 json.dump(company_page_array,f)
             counter = 0
+            with open("search_results.json", "wb") as g:
+                json.dump(driver, g)
         counter += 1
 
 if __name__ == '__main__':
