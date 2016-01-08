@@ -1,9 +1,7 @@
-import pickle
+import json
 import requests
 
 import api_vars
-
-# USE JSON EN/DECODER!
 
 def main():
 
@@ -13,8 +11,8 @@ def main():
 
         # get the pickle
         try:
-            with open("search_results.tia") as f:
-                company_dir = pickle.load(f)
+            with open("search_results.json", "rb") as f:
+                company_dir = json.load(f)
         except:
             company_dir = []
 
@@ -27,8 +25,8 @@ def main():
         for company in data:
             company_dir.append(company)
 
-        with open ("search_results.tia", "wb") as f:
-            pickle.dump(company_dir,f, protocol = 2)
+        with open ("search_results.json", "wb") as f:
+            json.dump(company_dir,f)
 
         current+=1
 
