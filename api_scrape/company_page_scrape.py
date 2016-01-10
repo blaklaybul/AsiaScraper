@@ -11,7 +11,7 @@ def main():
     counter = 0
 
     try:
-        with open("company_pages.json", "rb") as ff:
+        with open("data/company_pages.json", "rb") as ff:
             company_page_array = json.load(ff)
     except:
         company_page_array = []
@@ -19,7 +19,7 @@ def main():
     print len(company_page_array)
 
     # load the search_results to get company slugs
-    with open("search_results.json", "rb") as f:
+    with open("data/search_results.json", "rb") as f:
         driver = json.load(f)
 
     to_scrape = [i for i in driver if i and i["scraped"] == 0]
@@ -34,11 +34,12 @@ def main():
 
         company["scraped"] = 1
 
-        if counter == 500:
-            with open("company_pages.json", "wb") as f:
+        #need to write the file when we hit the end
+        if counter == 500 or counter == len(to_scrape)-1:
+            with open("data/company_pages.json", "wb") as f:
                 json.dump(company_page_array,f)
             counter = 0
-            with open("search_results.json", "wb") as g:
+            with open("data/search_results.json", "wb") as g:
                 json.dump(driver, g)
         counter += 1
 
