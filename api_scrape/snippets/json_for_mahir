@@ -1,0 +1,18 @@
+for company in [i for i in mike if i]:
+    profile = defaultdict(list)
+
+    profile["CompanyName"] = company["name"]
+    profile["tiaCompanyID"] = company["id"]
+    profile["tiaURL"] = company["entity"]["slug"]
+    profile["Country"] = [loc["country"]["name"] for loc in company["entity"]["locations"] if loc["type"] == "hq"][0] if [loc["country"] for loc in company["entity"]["locations"] if loc["type"] == "hq"] else ""
+    profile["FoundedDate"] = company["date_founded"]
+    profile["FoldedDate"] = company["date_folded"]
+    profile["valuations"] = company["valuations"]
+    profile["FundingStages"] = company["funding_stages"]
+    profile["industries"] = company["entity"]["industries"]
+    profile["description"] = company["description"]
+    profile["min_emp"] = profile["employee_min_count"]
+    profile["max_emp"] = profile["employee_max_count"]
+
+
+    comps.append(profile)
