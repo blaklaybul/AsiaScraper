@@ -1,16 +1,23 @@
-var w = 1000,
-    h = 1000,
+var Graph = function(industry) {
+
+var w = 300,
+    h = 300,
     fill = d3.scale.category20();
 
-var vis = d3.select("#chart")
+var vis = d3.select("body")
+  .append("div")
+  .style("float","left")
+  .attr("id", industry)
   .append("svg:svg")
-    .attr("width", w)
-    .attr("height", h);
+  .attr("width", w)
+  .attr("height", h);
 
-d3.json("force.json", function(json) {
+var file = "force_" + industry + ".json"
+
+d3.json(file, function(json) {
   var force = d3.layout.force()
-      .charge(-20)
-      .linkDistance(30)
+      .charge(-5)
+      .linkDistance(10)
       .nodes(json.nodes)
       .links(json.links)
       .size([w, h])
@@ -33,7 +40,7 @@ d3.json("force.json", function(json) {
       .attr("class", function(d){ return d.group})
       .attr("cx", function(d) { return d.x; })
       .attr("cy", function(d) { return d.y; })
-      .attr("r", 5)
+      .attr("r", 3)
       .attr("country", function(d){return d.location;})
       .style("fill", function(d) { return fill(d.location); })
       .call(force.drag);
@@ -46,11 +53,10 @@ d3.json("force.json", function(json) {
       .duration(1000)
       .style("opacity", 1);
 
-      d3.select("#chart")
-      .append("text")
-    .attr("x", 50)
-    .attr("y", 20)
-    .text(json.meta.industry);
+    d3.select("#"+industry)
+    .append("div")
+    .text(industry)
+    .style("text-align", "center");
 
 
   force.on("tick", function() {
@@ -63,3 +69,10 @@ d3.json("force.json", function(json) {
         .attr("cy", function(d) { return d.y; });
   });
 });
+
+};
+
+var graph1 = new Graph("Shopping")
+var graph2 = new Graph("Games")
+var graph3 = new Graph("SaaS")
+var graph4 = new Graph("News")

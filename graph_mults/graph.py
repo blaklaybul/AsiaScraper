@@ -5,16 +5,14 @@ from psycopg2.extras import RealDictCursor
 import networkx
 
 try:
-    conn = psycopg2.connect("dbname = dev_techinasia user = tableau host = localhost")
+    conn = psycopg2.connect("dbname = dev_techinasia user = michaelhi host = localhost")
     print "successful db connection!"
 except:
     print "database connection failed, quitting program"
     sys.exit(0)
 
 
-def main():
-
-    industry = 'Pets'
+def main(industry):
 
     nodes = getNodes(industry)
     node_lookup = {
@@ -41,7 +39,7 @@ def main():
         }
     }
 
-    with open("force.json", "wb") as j:
+    with open("force_" + industry + ".json", "wb") as j:
         json.dump(for_export, j)
 
 def getLinks(industry):
@@ -115,4 +113,5 @@ def getNodes(industry):
         return nodes
 
 if __name__ == '__main__':
-    main()
+    industry = sys.argv[1]
+    main(industry)
