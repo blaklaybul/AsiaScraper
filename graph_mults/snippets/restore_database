@@ -1,0 +1,1 @@
+psql -e -U michaelhi -d dev_techinasia -f test_dev_techinasia_export.pgsql
