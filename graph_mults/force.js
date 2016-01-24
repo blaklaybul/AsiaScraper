@@ -15,9 +15,14 @@ var vis = d3.select("body")
 var file = "force_" + industry + ".json"
 
 d3.json(file, function(json) {
+
+  var node_scale = d3.scale.linear()
+                    .domain([1, d3.max(json.nodes, function(d) { return d["degree"]; })])
+                    .range([2,10]);
+
   var force = d3.layout.force()
-      .charge(-5)
-      .linkDistance(10)
+      .charge(-10)
+      .linkDistance(20)
       .nodes(json.nodes)
       .links(json.links)
       .size([w, h])
@@ -40,13 +45,13 @@ d3.json(file, function(json) {
       .attr("class", function(d){ return d.group})
       .attr("cx", function(d) { return d.x; })
       .attr("cy", function(d) { return d.y; })
-      .attr("r", 3)
+      .attr("r", function(d) {return node_scale(d.degree)})
       .attr("country", function(d){return d.location;})
       .style("fill", function(d) { return fill(d.location); })
       .call(force.drag);
 
   node.append("svg:title")
-      .text(function(d) { return d.name; });
+      .text(function(d) { return d.location; });
 
   vis.style("opacity", 1e-6)
     .transition()

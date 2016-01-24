@@ -2,7 +2,8 @@ import sys
 import json
 import psycopg2
 from psycopg2.extras import RealDictCursor
-import networkx
+import networkx as nx
+from networkx.readwrite import json_graph
 
 try:
     conn = psycopg2.connect("dbname = dev_techinasia user = michaelhi host = localhost")
@@ -39,8 +40,10 @@ def main(industry):
         }
     }
 
+    dump_it = NetworkAnalysis(for_export)
+
     with open("force_" + industry + ".json", "wb") as j:
-        json.dump(for_export, j)
+        json.dump(dump_it, j)
 
 def getLinks(industry):
     cur = conn.cursor(cursor_factory=RealDictCursor)
@@ -111,6 +114,22 @@ def getNodes(industry):
             """)
         nodes = cur.fetchall()[0]["array_to_json"]
         return nodes
+
+def NetworkAnalysis(jsonGraph):
+    """gets graph defined by for export json and computes the top 3
+    most connected subgraphs"""
+
+    G = json_graph.node_link_graph(jsonGraph)
+    graphs = sorted(nx.connected_component_subgraphs(G), key = len, reverse=True)
+    (GC1, GC2, GC3, GC4, GC5) = graphs[0:5]
+    top5 = nx.compose_all([GC1,GC2,GC3,GC4,GC5])
+    deg = top5.degree()
+    nx.set_node_attributes(top5, "degree", deg)
+    take = {
+        "nodes": json_graph.node_link_data(top5)["nodes"],
+        "links": json_graph.node_link_data(top5)["links"]
+        }
+    return take
 
 if __name__ == '__main__':
     industry = sys.argv[1]
