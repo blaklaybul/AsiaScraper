@@ -1,8 +1,47 @@
+// load data first separately
+
+// make call to countries API to get full list of countries. this allows to set
+// color scale before we create the graphs
+
+// var color = function() {
+//
+//     var data;
+//
+//     return d3.json("http://localhost:5000/countries", GetFill);
+//
+//     function GetFill(jsonData){
+//
+//         // this.fill = d3.scale.category20()
+//         //     .domain(jsonData.countries);
+//
+//         data = jsonData.countries;
+//         return data;
+//     }
+//
+// };
+
+    // function(json){
+    //     fill = d3.scale.category20()
+    //             .domain(json.countries);
+    //     setFill();
+    //         })
+    //
+    // function setFill(){
+    //     var obj = {
+    //         fill: fill
+    //     };
+    //     return obj;
+    //     }
+    // return setFill();
+    // };
+    //
+    // return getit()
+
 var Graph = function(industry) {
 
 var w = 300,
     h = 300,
-    fill = d3.scale.category20();
+    fill = d3.scale.category10();
 
 var vis = d3.select("body")
   .append("div")
@@ -22,7 +61,7 @@ d3.json(file, function(json) {
 
   var force = d3.layout.force()
       .charge(-10)
-      .linkDistance(20)
+      .linkDistance(17)
       .nodes(json.nodes)
       .links(json.links)
       .size([w, h])
@@ -77,7 +116,7 @@ d3.json(file, function(json) {
 
 };
 
-var graph1 = new Graph("Shopping")
-var graph2 = new Graph("Games")
-var graph3 = new Graph("SaaS")
-var graph4 = new Graph("News")
+var graph1 = new Graph("Shopping");
+var graph2 = new Graph("Games");
+var graph3 = new Graph("SaaS");
+var graph4 = new Graph("News");
