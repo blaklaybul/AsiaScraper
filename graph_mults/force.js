@@ -46,22 +46,22 @@ var w = 300,
 var vis = d3.select("body")
   .append("div")
   .style("float","left")
-  .attr("id", industry)
+  .attr("id", industry.replace(" ","_"))
   .append("svg:svg")
   .attr("width", w)
   .attr("height", h);
 
-var file = "force_" + industry + ".json"
+var file = "http://localhost:5000/industryGraph?industry=" + industry
 
 d3.json(file, function(json) {
 
   var node_scale = d3.scale.linear()
                     .domain([1, d3.max(json.nodes, function(d) { return d["degree"]; })])
-                    .range([2,10]);
+                    .range([2,8]);
 
   var force = d3.layout.force()
-      .charge(-10)
-      .linkDistance(17)
+      .charge(-3)
+      .linkDistance(3)
       .nodes(json.nodes)
       .links(json.links)
       .size([w, h])
@@ -97,7 +97,8 @@ d3.json(file, function(json) {
       .duration(1000)
       .style("opacity", 1);
 
-    d3.select("#"+industry)
+
+    d3.select("#"+industry.replace(" ","_"))
     .append("div")
     .text(industry)
     .style("text-align", "center");
@@ -120,3 +121,7 @@ var graph1 = new Graph("Shopping");
 var graph2 = new Graph("Games");
 var graph3 = new Graph("SaaS");
 var graph4 = new Graph("News");
+var graph5 = new Graph("Education Tech");
+var graph6 = new Graph("Software");
+var graph7 = new Graph("Fashion");
+var graph8 = new Graph("E-Commerce Platforms");
