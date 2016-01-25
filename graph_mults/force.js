@@ -37,7 +37,7 @@
     //
     // return getit()
 
-var Graph = function(industry) {
+var Graph = function(industry, subgraphs) {
 
 var w = 300,
     h = 300,
@@ -51,17 +51,17 @@ var vis = d3.select("body")
   .attr("width", w)
   .attr("height", h);
 
-var file = "http://localhost:5000/industryGraph?industry=" + industry
+var file = "http://localhost:5000/industryGraph/" + industry + "?subgraphs=" + subgraphs
 
 d3.json(file, function(json) {
 
   var node_scale = d3.scale.linear()
                     .domain([1, d3.max(json.nodes, function(d) { return d["degree"]; })])
-                    .range([2,8]);
+                    .range([2,9]);
 
   var force = d3.layout.force()
-      .charge(-3)
-      .linkDistance(3)
+      .charge(-10)
+      .linkDistance(15)
       .nodes(json.nodes)
       .links(json.links)
       .size([w, h])
@@ -116,12 +116,11 @@ d3.json(file, function(json) {
 });
 
 };
-
-var graph1 = new Graph("Shopping");
-var graph2 = new Graph("Games");
-var graph3 = new Graph("SaaS");
-var graph4 = new Graph("News");
-var graph5 = new Graph("Education Tech");
-var graph6 = new Graph("Software");
-var graph7 = new Graph("Fashion");
-var graph8 = new Graph("E-Commerce Platforms");
+var graph1 = new Graph("Shopping",1);
+var graph2 = new Graph("Games",1);
+var graph3 = new Graph("SaaS",1);
+var graph4 = new Graph("News",1);
+var graph5 = new Graph("Education Tech",1);
+var graph6 = new Graph("Software",1);
+var graph7 = new Graph("Fashion",1);
+var graph7 = new Graph("Services",1);
