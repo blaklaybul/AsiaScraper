@@ -28,31 +28,31 @@ function buildGraphs(){
     //     new Graph(top_industries[i],subgraphs);
     // }
 
-var graph2 = new Graph("Games",1);
-   var graph3 = new Graph("SaaS",1);
-   var graph4 = new Graph("News",1);
-   var graph5 = new Graph("Education Tech",1);
-   var graph6 = new Graph("Software",1);
-   var graph7 = new Graph("Fashion",1);
-   var graph7 = new Graph("Digital Media",1);
-   var graph7 = new Graph("Restaurants and food",1);
-   var graph7 = new Graph("Web Design",1);
-   var graph7 = new Graph("Financial Services",1);
-   var graph7 = new Graph("Enterprise Software",1);
-   var graph7 = new Graph("Social Media",1);
-   var graph7 = new Graph("Transportation",1);
-   var graph7 = new Graph("Social Networking",1);
-   var graph7 = new Graph("Human Resource",1);
-   var graph7 = new Graph("Shopping",1);
-   var graph7 = new Graph("Services",1);
-   var graph7 = new Graph("Health Care",1);
+var graph2 = new Graph("Games",12);
+   var graph3 = new Graph("SaaS",12);
+   var graph4 = new Graph("News",12);
+   var graph5 = new Graph("Education Tech",12);
+   var graph6 = new Graph("Software",12);
+   var graph7 = new Graph("Fashion",12);
+   var graph7 = new Graph("Digital Media",12);
+   var graph7 = new Graph("Restaurants and food",12);
+   var graph7 = new Graph("Web Design",12);
+   var graph7 = new Graph("Financial Services",12);
+   var graph7 = new Graph("Enterprise Software",12);
+   var graph7 = new Graph("Social Media",12);
+   var graph7 = new Graph("Transportation",12);
+   var graph7 = new Graph("Social Networking",12);
+   var graph7 = new Graph("Human Resource",12);
+   var graph7 = new Graph("Shopping",12);
+   var graph7 = new Graph("Services",12);
+   var graph7 = new Graph("Health Care",12);
 
 }
 
 var Graph = function(industry, subgraphs) {
 
-var w = 300,
-    h = 300
+var w = 400,
+    h = 400
 
 
 var vis = d3.select("body")
@@ -101,7 +101,7 @@ d3.json(file, function(json) {
       .attr("class", function(d){ return d.group})
       .attr("cx", function(d) { return d.x; })
       .attr("cy", function(d) { return d.y; })
-      .attr("r", function(d){ return d.group == 1 ? 2 : node_scale(d.degree)}) //function(d) {return node_scale(d.cent_deg)})
+      .attr("r", function(d){ return d.group == 2 ? 2 : node_scale(d.degree)}) //function(d) {return node_scale(d.cent_deg)})
       .attr("country", function(d){return d.location;})
       .style("fill", function(d) { return fillScale(d.location); })
       .style("stroke", function(d){return d.group == 2 ? "black" : undefined })
