@@ -27,8 +27,8 @@ function buildGraphs(){
     //     console.log(top_industries[i]);
     //     new Graph(top_industries[i],subgraphs);
     // }
-
-var graph2 = new Graph("Games",12);
+   var graph7 = new Graph("E-Commerce Platforms",12);
+   var graph2 = new Graph("Games",12);
    var graph3 = new Graph("SaaS",12);
    var graph4 = new Graph("News",12);
    var graph5 = new Graph("Education Tech",12);
@@ -46,6 +46,7 @@ var graph2 = new Graph("Games",12);
    var graph7 = new Graph("Shopping",12);
    var graph7 = new Graph("Services",12);
    var graph7 = new Graph("Health Care",12);
+
 
 }
 
@@ -118,7 +119,7 @@ d3.json(file, function(json) {
 
     d3.select("#"+industry.replace(/ /g,"_"))
     .append("div")
-    .text(industry)
+    .text(industry + "(" + Math.round(json.frac*100,3) + "%)")
     .style("text-align", "center");
 
 
